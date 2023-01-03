@@ -1,13 +1,8 @@
 /-  *zig-sequencer
 /+  ethereum, merk, smart=zig-sys-smart
-/=  fungible  /con/lib/fungible-interface-types
-/=  nft  /con/lib/nft-interface-types
-/=  publish  /con/lib/publish-interface-types
 /=  zigs  /con/lib/zigs-interface-types
-/*  fungible-contract  %jam  /con/compiled/fungible/jam
-/*  nft-contract       %jam  /con/compiled/nft/jam
-/*  publish-contract   %jam  /con/compiled/publish/jam
 /*  zigs-contract      %jam  /con/compiled/zigs/jam
+/*  escrow-contract    %jam  /con/compiled/escrow/jam
 :-  %say
 |=  [[now=@da eny=@uvJ bek=beak] [rollup-host=@p town-id=@ux private-key=@ux ~] ~]
 ::  one hundred million testnet zigs, now and forever
@@ -84,80 +79,16 @@
       interface=interface-json:zigs
       types=types-json:zigs
   ==
-::  publish.hoon contract
-=/  publish-pact
+::  escrow.hoon contract
+=/  escrow-pact
   ^-  pact:smart
-  :*  0x1111.1111  ::  id
-      0x0          ::  source
-      0x0          ::  holder
-      town-id     ::  town-id
-      [- +]:(cue publish-contract)
-      interface=interface-json:publish
-      types=~
-  ==
-::  nft.hoon contract
-=/  nft-pact
-  ^-  pact:smart
-  =/  code  (cue nft-contract)
-  :*  (hash-pact:smart 0x0 0x0 town-id code)
-      0x0          ::  source
-      0x0          ::  holder
-      town-id     ::  town-id
-      [- +]:code
-      interface=interface-json:nft
-      types=types-json:nft
-  ==
-::
-:: NFT stuff
-::
-=/  nft-metadata-data
-  ^-  data:smart
-  :*  id=`@ux`'nft-metadata'
-      source=id:nft-pact
-      holder=id:nft-pact
-      town-id
-      salt=`@`'nftsalt'
-      label=%metadata
-      :*  name='Ziggurat Girls'
-          symbol='GOODART'
-          properties=(~(gas pn:smart *(pset:smart @tas)) `(list @tas)`~[%hat %eyes %mouth])
-          supply=1
-          cap=`5
-          mintable=%.y
-          minters=(~(gas pn:smart *(pset:smart address:smart)) ~[pubkey-1])
-          deployer=pubkey-1
-          salt=`@`'nftsalt'
-      ==
-  ==
-=/  nft-1  (hash-data:smart id:nft-pact pubkey-1 town-id `@`'nftsalt1')
-=/  nft-data
-  ^-  data:smart
-  :*  nft-1
-      id:nft-pact
-      pubkey-1
-      town-id
-      salt=`@`'nftsalt1'
-      label=%nft
-      :*  1
-          'ipfs://QmUbFVTm113tJEuJ4hZY2Hush4Urzx7PBVmQGjv1dXdSV9'
-          id:nft-metadata-data
-          ~
-          %-  ~(gas py:smart *(pmap:smart @tas @t))
-          `(list [@tas @t])`~[[%hat 'pyramid'] [%eyes 'big'] [%mouth 'smile']]
-          %.y
-      ==
-  ==
-::  fungible.hoon contract
-=/  fungible-pact
-  ^-  pact:smart
-  =/  code  (cue fungible-contract)
-  :*  (hash-pact:smart 0x0 0x0 town-id code)
+  :*  0xabcd.abcd  ::  id
       0x0          ::  source
       0x0          ::  holder
       town-id      ::  town-id
-      [- +]:code
-      interface=interface-json:fungible
-      types=types-json:fungible
+      [- +]:(cue escrow-contract)
+      interface=~
+      types=~
   ==
 ::
 =/  fake-state
@@ -165,14 +96,10 @@
   %+  gas:(bi:merk id:smart item:smart)
     *(merk:merk id:smart item:smart)
   :~  [id.zigs-pact [%| zigs-pact]]
-      [id.publish-pact [%| publish-pact]]
-      [id.nft-pact [%| nft-pact]]
-      [id.fungible-pact [%| fungible-pact]]
+      [id.escrow-pact [%| escrow-pact]]
       [zigs-1 beef-zigs-item]
       [zigs-2 dead-zigs-item]
       [zigs-3 cafe-zigs-item]
-      [nft-1 [%& nft-data]]
-      [id.nft-metadata-data [%& nft-metadata-data]]
       [id.zigs-metadata [%& zigs-metadata]]
   ==
 ::
